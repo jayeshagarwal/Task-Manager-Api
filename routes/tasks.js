@@ -3,6 +3,7 @@ const task = require('../models/task')
 const auth = require("../middlewares/auth") 
 const router = express.Router()
 
+// signing up a new user
 router.post('/', auth, async (req,res)=> {
     try {
         req.body.owner = req.user._id
