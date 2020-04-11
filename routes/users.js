@@ -5,6 +5,7 @@ const multer = require('multer')
 const sharp = require('sharp')
 const router = express.Router()
 
+// signing up a new user
 router.post('/', async (req,res)=> {
     try {
         const User = new user(req.body)
@@ -18,6 +19,7 @@ router.post('/', async (req,res)=> {
     // replace Jayesh   Agarwal with Jayesh Agarwal
 })
 
+// logging a user
 router.get('/login', async(req,res)=> {
     try {
         const User = await user.findByCredentials(req.body.email, req.body.password)
@@ -29,10 +31,12 @@ router.get('/login', async(req,res)=> {
     }
 })
 
+// showing profile of logged in user
 router.get('/me', auth, async (req,res)=> {
     res.send(req.user)
 })
 
+// logged out user
 router.post('/logout', auth, async (req,res)=> {
     try {
         req.user.tokens = req.user.tokens.filter((token)=> {
@@ -47,6 +51,7 @@ router.post('/logout', auth, async (req,res)=> {
     }
 })
 
+// logging out user from all devices
 router.post('/logout/all', auth, async (req,res)=> {
     try {
         req.user.tokens = []
@@ -59,6 +64,7 @@ router.post('/logout/all', auth, async (req,res)=> {
     }
 })
 
+// updating a logged in user
 router.patch('/me', auth, async (req,res)=> {
     try {
         for(var key in req.body)
@@ -74,6 +80,7 @@ router.patch('/me', auth, async (req,res)=> {
     }
 })
 
+//deleting a looged in user
 router.delete('/me', auth, async (req,res)=> {
     try {
         await req.user.remove()
@@ -84,6 +91,7 @@ router.delete('/me', auth, async (req,res)=> {
     }
 })
 
+// uploading profile pic of logged in user 
 const upload = multer({
     limits: {
         fileSize: 1000000
@@ -105,12 +113,14 @@ router.post('/me/avatar', auth, upload.single('avatar'), async (req,res)=> {
     res.status(400).send({error: error.message})
 })
 
+// deleting profile pic of logged in user 
 router.delete('/me/avatar', auth, async (req,res)=> {
     req.user.avatar = undefined
     await req.user.save()
     res.send()
 })
 
+// show profile pic of logged in user 
 router.get('/me/avatar', auth, (req,res)=> {
     try {
         if(!req.user.avatar)

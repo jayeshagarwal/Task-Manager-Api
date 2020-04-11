@@ -53,6 +53,7 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// hashing password before saving a user whenever password is modified
 userSchema.pre('save', async function (next) {
     const user = this;
     if(user.isModified('password'))
@@ -62,12 +63,14 @@ userSchema.pre('save', async function (next) {
     next()
 });
 
+// removing task of a loggedIn user before deleting him 
 userSchema.pre('remove', async function (next) {
     const user = this;
     await task.deleteMany({owner: user._id})
     next()
 })
 
+// validating user before login
 userSchema.statics.findByCredentials = async (email, password) => {
     const User = await user.findOne({email})
     if(!User)
@@ -82,6 +85,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return User
 }
 
+// generating a jwt whenever user is login or signing up
 userSchema.methods.generateToken = async function() {
     const user = this
     const token = jwt.sign({_id: user._id.toString()}, process.env.JWT_KEY)
@@ -90,6 +94,7 @@ userSchema.methods.generateToken = async function() {
     return token
 }
 
+// deleting specific data of user before sending any response
 userSchema.methods.toJSON = function() {
     const user = this
     const userObj = user.toObject()

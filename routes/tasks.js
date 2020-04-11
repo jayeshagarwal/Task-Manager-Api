@@ -3,7 +3,7 @@ const task = require('../models/task')
 const auth = require("../middlewares/auth") 
 const router = express.Router()
 
-// signing up a new user
+// creating new task for loggedin user
 router.post('/', auth, async (req,res)=> {
     try {
         req.body.owner = req.user._id
@@ -15,6 +15,7 @@ router.post('/', auth, async (req,res)=> {
     }
 })
 
+// getting all tasks of logged in user
 router.get('/', auth, async (req,res)=> {
     try {
         pagination = {
@@ -23,6 +24,7 @@ router.get('/', auth, async (req,res)=> {
         }
         if(req.query.sortBy)
         {
+            // sorting result by time when they created
             const parts = req.query.sortBy.split(':')
             sort = { createdAt: parts[1]=='desc'? -1:1 }
             delete(req.query.sortBy)
@@ -42,6 +44,7 @@ router.get('/', auth, async (req,res)=> {
     }
 })
 
+// getting a specific task of loggedin user
 router.get('/:id', auth, async (req,res)=> {
     try {
         const Task = await task.findOne({_id: req.params.id, owner: req.user._id})
@@ -56,6 +59,7 @@ router.get('/:id', auth, async (req,res)=> {
     }
 })
 
+// updating a specific task of loggedin user
 router.patch('/:id', auth, async (req,res)=> {
     try {
         const Task = await task.findOne({_id: req.params.id, owner: req.user._id})
@@ -76,6 +80,7 @@ router.patch('/:id', auth, async (req,res)=> {
     }
 })
 
+// deleting a specific task of loggedin user
 router.delete('/:id', auth, async (req,res)=> {
     try {
         const Task = await task.findOneAndDelete({_id: req.params.id, owner: req.user._id})
